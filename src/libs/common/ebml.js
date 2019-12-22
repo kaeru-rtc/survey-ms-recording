@@ -61,20 +61,24 @@ const _getData = (ab, pos, len, dataType) => {
 
   if( dataType === "string" ) {
     return new TextDecoder("utf-8").decode(u8arr)
+  } else if ( dataType === "binary" ) {
+    return `length: ${u8arr.length}`
   } else {
-    return u8arr
+    // tips - >>> 0 returns unsigned integer
+    return u8arr.reduce( (prev, curr) => (
+      ( prev << 8 ) + curr
+    ), 0) >>> 0
   }
 }
 
 export const parseEbml = ab => {
   // just debug
   const arr = new Uint8Array( ab )
-  // console.log( arr )
 
   const max = ab.byteLength
   let pos = 0, resId, resLen, resData, meta
 
-  while( pos < max ) {
+  while( pos < ( max - 1 ) ) {
     resId = _getVint( ab, pos )
     pos += resId.w
 
@@ -92,20 +96,9 @@ export const parseEbml = ab => {
       resData = _getData( ab, pos, resLen.len, meta.dataType )
       pos += resLen.len
     }
+
     console.log( JSON.stringify({ meta, resData }, null, 2) )
+    
     resData = null
   }
-
-  // const ret0 = _getVint( ab, pos )
-  // pos += ret0.w
-  // const ret1 = _getVint( ab, pos )
-  // pos += ret1.len
-  // const ret2 = _getVint( ab, pos )
-  // pos += ret2.w
-  // const ret3 = _getVint( ab, pos )
-
-  // console.log( ret0 )
-  // console.log( ret2 )
-  // console.log( ret3 )
-  // console.log( pos )
 }
