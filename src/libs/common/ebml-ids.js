@@ -116,6 +116,11 @@ export const ebmlIds = {
     dataType: "integer",
     label: "DefaultDuration"
   },
+  "55EE": {
+    dataType: "integer",
+    label: "MaxBlockAdditionID"
+  },
+ 
   "536E": {
     dataType: "string",
     label: "Name"
