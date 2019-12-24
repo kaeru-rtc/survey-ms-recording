@@ -43,7 +43,7 @@ const _getVint = ( ab, pos ) => {
   }
 
   const _h = head & masks[ w - 1 ]
-  len = _getLen( ab, pos, w, _h )
+  len = w !== 8 ? _getLen( ab, pos, w, _h ) : "inifinite"
   id = _getEbmlId( ab, pos, w )
 
   return { w, len, id }

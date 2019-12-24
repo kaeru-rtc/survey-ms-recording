@@ -10,6 +10,7 @@ import RecordedFiles from './components/recorded-files'
 import EbmlsViewer from './components/ebmls-viewer'
 
 import { 
+  Card,
   Col, 
   Divider, 
   Row, 
@@ -26,7 +27,6 @@ class AppMain extends Component {
   render() {
     const keys = this.props.store.mapEbmls.size > 0 ?
       Array.from(this.props.store.mapEbmls.keys()) : [] 
-    console.log( keys )
 
     return (
       <div className="AppMain">
@@ -40,49 +40,54 @@ class AppMain extends Component {
             </div>
           )
         }
-        <Divider />
-
-        <Title level={2}>webm parse results</Title>
-        <Tabs defaultActiveKey={1}>
-          <TabPane tab="structure" key={1}>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Title level={3}>ondataavailable</Title>
-                {
-                  keys.map( (key, idx) => {
-                    const ebmls = this.props.store.mapEbmls.get( key )
-                    const ts = new Date( key ).toLocaleString()
-                    return ( 
-                      <div key={idx}>
-                        <Title level={4}>{ts}</Title>
-                        <EbmlsViewer key={idx} store={{ebmls}} />
-                      </div> )
-                    }) 
-                }
-              </Col>
-              <Col span={12}>
-                <Title level={3}>onstop</Title>
-                <EbmlsViewer {...this.props} />
-              </Col>
-            </Row>
-          </TabPane>
-          <TabPane tab="hex dump" key={2}>
-            <Row gutter={16}>
-              <Col span={12}>
-                <ShowHexDumps {...this.props} />
-              </Col>
-              <Col span={12}>
-                <ShowFinalDump {...this.props} />
-              </Col>
-            </Row>
-          </TabPane>
-        </Tabs>
-        <Divider />
         {
           this.props.store.blobs.length > 0 ? (
-            <RecordedFiles {...this.props} />
+            <Card>
+              <RecordedFiles {...this.props} />
+            </Card>
           ): ''
         }
+        { keys.length > 0 ? (
+          <div>
+            <Title level={2}>webm results</Title>
+            <Card>
+              <Tabs defaultActiveKey="1">
+                <TabPane tab="structure" key="1">
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <Title level={3}>ondataavailable</Title>
+                      {
+                        keys.map( (key, idx) => {
+                          const ebmls = this.props.store.mapEbmls.get( key )
+                          const ts = new Date( key ).toLocaleString()
+                          return ( 
+                            <div key={idx}>
+                              <EbmlsViewer key={idx} store={{ebmls}} title={ts} />
+                            </div> )
+                          }) 
+                      }
+                    </Col>
+                    <Col span={12}>
+                      <Title level={3}>onstop</Title>
+                      <EbmlsViewer {...this.props} title="final data" />
+                    </Col>
+                  </Row>
+                </TabPane>
+                <TabPane tab="hex dump" key="2">
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <ShowHexDumps {...this.props} />
+                    </Col>
+                    <Col span={12}>
+                      <ShowFinalDump {...this.props} />
+                    </Col>
+                  </Row>
+                </TabPane>
+              </Tabs>
+            </Card>
+            <Divider />
+          </div>
+        ): ''}
         <Divider />
       </div>
     )

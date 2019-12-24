@@ -2,7 +2,7 @@ import { observable, computed, action } from 'mobx'
 import { parseEbml } from '../libs/common/ebml'
 import hexdump from 'hexdump-js'
 
-const RECORDING_SEC = 1 
+const RECORDING_SEC = 5 
 const SLICE_TIME = 400
 
 
@@ -25,7 +25,7 @@ export default class MainStore {
   }
 
   @computed get remainingInPercent() {
-    return ( RECORDING_SEC - this.remaining ) * 100
+    return (( RECORDING_SEC - this.remaining ) / RECORDING_SEC ) * 100
   }
 
   @action changeConstraints = newConstraints => (
