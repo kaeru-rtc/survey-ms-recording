@@ -14,6 +14,9 @@ export default class MainStore {
   @observable mediaRecorder = null
   @observable blobs = []
 
+  @observable ebmls = []
+  @observable mapEbmls = new Map()
+
   @observable dumps = []
   @observable finaldump = ''
 
@@ -42,7 +45,10 @@ export default class MainStore {
 
     this.mediaRecorder.ondataavailable = async e => {
       const ab = await e.data.arrayBuffer()
-      parseEbml( ab )
+      const ts = Date.now()
+
+      this.mapEbmls.set( ts, parseEbml(ab))
+      
       this.dumps.push( hexdump( ab ) )
       this.chunks.push( e.data )
     }
@@ -52,13 +58,13 @@ export default class MainStore {
     this.mediaRecorder.stop()
 
     this.mediaRecorder.onstop = async _ => {
-      // fixme - change mimetype when video is selected
       const mime = this.constraints.video ? 
         { 'type': "video/webm; codecs='vp8,opus'"} : 
         { 'type': 'audio/ogg; codecs=opus'}
       const blob = new Blob( this.chunks, mime)
       const ab = await blob.arrayBuffer()
-      parseEbml( ab )
+
+      this.ebmls = parseEbml( ab )
       this.finaldump = hexdump( ab )
       this.blobs.push( blob )
     }

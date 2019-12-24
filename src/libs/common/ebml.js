@@ -42,15 +42,9 @@ const _getVint = ( ab, pos ) => {
     w = -1
   }
 
-  // get VINT len
-  // if( w < 5 ) {
-    const _h = head & masks[ w - 1 ]
-    len = _getLen( ab, pos, w, _h )
-    id = _getEbmlId( ab, pos, w )
-  // } else {
-  //   len = -1
-  //   id = 'FFFFFFFFFFFFFF'
-  // }
+  const _h = head & masks[ w - 1 ]
+  len = _getLen( ab, pos, w, _h )
+  id = _getEbmlId( ab, pos, w )
 
   return { w, len, id }
 }
@@ -62,8 +56,13 @@ const _getData = (ab, pos, len, dataType) => {
   if( dataType === "string" ) {
     return new TextDecoder("utf-8").decode(u8arr)
   } else if ( dataType === "binary" ) {
-    return `length: ${u8arr.length}`
+    const d = _getEbmlId( ab, pos, u8arr.length )
+    return d.match(/.{2}/g).join(" ")
+  } else if( dataType === 'float' ) {
+    const v = new DataView( buff )
+    return v.getFloat32()
   } else {
+    // case - integer
     // tips - >>> 0 returns unsigned integer
     return u8arr.reduce( (prev, curr) => (
       ( prev << 8 ) + curr
@@ -72,10 +71,7 @@ const _getData = (ab, pos, len, dataType) => {
 }
 
 export const parseEbml = ab => {
-  // just debug
-  const arr = new Uint8Array( ab )
-
-  const max = ab.byteLength
+  const max = ab.byteLength, ret = []
   let pos = 0, resId, resLen, resData, meta
 
   while( pos < ( max - 1 ) ) {
@@ -84,9 +80,10 @@ export const parseEbml = ab => {
 
     meta = ebmlIds[resId.id]
     if( !meta ) {
-      console.warn( resId )
-      console.warn(`cannot find meta info for ${resId.id}`)
-      break
+      ret.push( { meta: {
+        label: `cannot find meta info for ${resId.id}`
+      }})
+      break;
     }
 
     resLen = _getVint( ab, pos )
@@ -97,8 +94,10 @@ export const parseEbml = ab => {
       pos += resLen.len
     }
 
-    console.log( JSON.stringify({ meta, resData }, null, 2) )
+    ret.push({ resId, meta, resLen, resData })
     
     resData = null
   }
+
+  return ret
 }
