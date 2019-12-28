@@ -17,8 +17,8 @@ export default class LocalMediaViewer extends Component {
       <div className="LocalMediaViewer">
         <Title level={3}>Recording...</Title>
         { !this.props.store.constraints.video ?
-          ( <audio ref={ a => { this.media = a }} controls/>) :
-          ( <video ref={ v => { this.media = v }} controls/>)
+          ( <audio ref={ a => { this.media = a }} muted controls/>) :
+          ( <video ref={ v => { this.media = v }} muted controls/>)
         }
       </div>
     )

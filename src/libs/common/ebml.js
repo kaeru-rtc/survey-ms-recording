@@ -76,9 +76,11 @@ export const parseEbml = ab => {
 
   while( pos < ( max - 1 ) ) {
     resId = _getVint( ab, pos )
-    pos += resId.w
 
     meta = ebmlIds[resId.id]
+    if( meta && meta.border ) console.log( "border - %d, %d", pos, max )
+    pos += resId.w
+
     if( !meta ) {
       ret.push( { meta: {
         label: `cannot find meta info for ${resId.id}`

@@ -2,11 +2,16 @@ import { observable, computed, action } from 'mobx'
 import { parseEbml } from '../libs/common/ebml'
 import hexdump from 'hexdump-js'
 
+import { EventEmitter } from 'events'
+
 const RECORDING_SEC = 5 
 const SLICE_TIME = 400
 
 
 export default class MainStore {
+  @observable finalEmitter = new EventEmitter()
+  @observable emitter = new EventEmitter()
+
   @observable constraints = { audio: true, video: false }
   @observable stream = null
   @observable remaining = RECORDING_SEC
@@ -20,12 +25,12 @@ export default class MainStore {
   @observable dumps = []
   @observable finaldump = ''
 
-  @action decreaseRemaining = _ => {
-    this.remaining--
-  }
-
   @computed get remainingInPercent() {
     return (( RECORDING_SEC - this.remaining ) / RECORDING_SEC ) * 100
+  }
+
+  @action decreaseRemaining = _ => {
+    this.remaining--
   }
 
   @action changeConstraints = newConstraints => (
@@ -45,6 +50,7 @@ export default class MainStore {
 
     this.mediaRecorder.ondataavailable = async e => {
       const ab = await e.data.arrayBuffer()
+      this.emitter.emit('data', ab)
       const ts = Date.now()
 
       this.mapEbmls.set( ts, parseEbml(ab))
@@ -63,6 +69,8 @@ export default class MainStore {
         { 'type': 'audio/ogg; codecs=opus'}
       const blob = new Blob( this.chunks, mime)
       const ab = await blob.arrayBuffer()
+      
+      this.finalEmitter.emit('data', ab)
 
       this.ebmls = parseEbml( ab )
       this.finaldump = hexdump( ab )

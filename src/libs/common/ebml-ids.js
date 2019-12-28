@@ -10,6 +10,7 @@ export const ebmlIds = {
     level: 0,
     dataType: null,
     label: "EBML",
+    border: true
   },
   "4286": {
     level: 1,
@@ -52,7 +53,8 @@ export const ebmlIds = {
   "18538067": {
     level: 0,
     dataType: null,
-    label: "Segment"
+    label: "Segment",
+    border: true
   },
   "1549A966": {
     level: 1,
@@ -283,7 +285,8 @@ export const ebmlIds = {
   "1F43B675": {
     level: 1,
     dataType: null, 
-    label: "Cluster"
+    label: "Cluster",
+    border: true
   },
   "E7": {
     level: 2,
